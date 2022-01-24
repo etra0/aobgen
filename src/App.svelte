@@ -1,10 +1,38 @@
 <script lang="ts">
-	export let name: string;
+import { tick } from "svelte";
+
+	import { AOBGenerator } from "./AOBGen";
+	import { tick } from "svelte";
+
+	let aobgen = new AOBGenerator();
+	let input = '';
+	let wildcardOffsets = false;
+	let resultHover = "";
+	let inputbox;
+	$: result = aobgen.generateAob(input, wildcardOffsets);
+
+	async function handleMouse(inputbox: any, event: MouseEvent | KeyboardEvent, wildcard: boolean) {
+		const { selectionStart, selectionEnd, value } = inputbox;
+		const selection = value.slice(selectionStart, selectionEnd);
+		if (selection === "") {
+			resultHover = "";
+			return;
+		}
+
+		resultHover = aobgen.generateAob(selection, wildcard);
+		console.log(selection, selectionStart, selectionEnd)
+		await tick();
+	}
+
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+	<textarea bind:value={input} placeholder="Enter the disassembly"
+		on:mouseup={event => handleMouse(inputbox, event, wildcardOffsets)}
+		bind:this={inputbox}
+	/>
+	<input type="checkbox" bind:checked={wildcardOffsets}>
+	<h1>Hello {resultHover || result}!</h1>
 </main>
 
 <style>
