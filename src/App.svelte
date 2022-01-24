@@ -30,9 +30,14 @@ import { tick } from "svelte";
 	<textarea bind:value={input} placeholder="Enter the disassembly"
 		on:mouseup={event => handleMouse(inputbox, event, wildcardOffsets)}
 		bind:this={inputbox}
+		rows="20"
 	/>
-	<input type="checkbox" bind:checked={wildcardOffsets}>
-	<h1>Hello {resultHover || result}!</h1>
+	<div class="info">
+		<label for="wildcard">Wildcard offsets: </label>
+		<input name="wildcard" type="checkbox" bind:checked={wildcardOffsets} on:change={() => handleMouse(inputbox, null, wildcardOffsets)}>
+	</div>
+	<p>AOB: {resultHover || result}</p>
+	<button on:click={() => navigator.clipboard.writeText(resultHover || result)}>Copy to clipboard</button>
 </main>
 
 <style>
@@ -41,6 +46,18 @@ import { tick } from "svelte";
 		padding: 1em;
 		max-width: 240px;
 		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.info {
+		display: inline-flex;
+		font-size: 1em;
+	}
+
+	input {
+		margin-left: 5px;
+		margin-bottom: 0px;
 	}
 
 	h1 {

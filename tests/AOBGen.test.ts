@@ -24,7 +24,7 @@ describe("Handle Cheat Engine", () => {
         const aobgen = new AOBGenerator();
         const snippet = `\
 notepad++.exe+1651DF - E8 54E80100          - call notepad++.exe+183A38
-notepad++.exe+1651E4 - 48 8D 05 182BOCOR    - lea rax, [notepad++.exe+227D08] { (7FF6A97D71B0) }
+notepad++.exe+1651E4 - 48 8D 05 182B0C00    - lea rax, [notepad++.exe+227D08] { (7FF6A97D71B0) }
 notepad++.exe+1651EB - 48 89 03             - mov [rbx],rax
 notepad++.exe+1651EE - 48 8B C3             - mov rax, rbx`
         expect(aobgen.generateAob(snippet, false)).toEqual("E8 ?? ?? ?? ?? 48 8D 05 ?? ?? ?? ?? 48 89 03 48 8B C3");
