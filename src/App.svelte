@@ -36,7 +36,7 @@ import { tick } from "svelte";
 		<label for="wildcard">Wildcard offsets: </label>
 		<input name="wildcard" type="checkbox" bind:checked={wildcardOffsets} on:change={() => handleMouse(inputbox, null, wildcardOffsets)}>
 	</div>
-	<p>AOB: {resultHover || result}</p>
+	<p>AOB: <code>{resultHover || result}</code></p>
 	<button on:click={() => navigator.clipboard.writeText(resultHover || result)}>Copy to clipboard</button>
 </main>
 

@@ -2,6 +2,7 @@ export class AOBGenerator {
     generateAob(toParse: string, alsoWildcardOffsets: boolean): string {
         const lineEndings = /[\r\n]/;
         const splitted = toParse.split(lineEndings);
+        const countChar = (arr: string[], c: string) => arr.reduce((acc, x) => acc + (x == c ? 1 : 0), 0);
 
         if (splitted.length == 0)
             return "";
@@ -9,7 +10,7 @@ export class AOBGenerator {
         if (splitted[0].includes("|"))
             return this.handleX64Dbg(splitted, alsoWildcardOffsets);
         // A bit boilerplate-y, but we basically check how many times '-' is in the string, according to Frans's version.
-        else if (splitted[0].split("").reduce((acc: number, x: string) => acc + (x == "-" ? 1 : 0), 0))
+        else if (countChar(splitted[0].split(""), "-") > 1)
             return this.handleCheatEngine(splitted, alsoWildcardOffsets);
         else 
             return "<Unknown Format>";
