@@ -1,3 +1,8 @@
+// AOBGen TypeScript rewrite by Sebastián Aedo.
+// This tool is heavily based on this file which is licensed under MIT: 
+// https://github.com/FransBouma/InjectableGenericCameraSystem/blob/master/Tools/AOBGen/AOBGenerator.cs
+// So all rights reserved to Frans Bouma as well.
+
 export class AOBGenerator {
     generateAob(toParse: string, alsoWildcardOffsets: boolean): string {
         const lineEndings = /[\r\n]/;
@@ -65,7 +70,7 @@ export class AOBGenerator {
                     result += AOBGenerator.pureBytes(bytes);
 
                 case 8:
-                    if (this.checkIfShouldBeWildcarded(bytes.toLowerCase(), thirdFragment, alsoWildcardOffsets)) {
+                    if (this.shouldWildcard(bytes.toLowerCase(), thirdFragment, alsoWildcardOffsets)) {
                         result += "?? ?? ?? ?? ";
                     } else {
                         result += AOBGenerator.pureBytes(bytes);
@@ -79,7 +84,7 @@ export class AOBGenerator {
         return result;
     }
 
-    private checkIfShouldBeWildcarded(bytes: string, thirdFragment: string, alsoWildcardOffsets: boolean): boolean {
+    private shouldWildcard(bytes: string, thirdFragment: string, alsoWildcardOffsets: boolean): boolean {
         const littleEndianValue = "" + bytes[6] + bytes[7] + bytes[4] + bytes[5] + bytes[2] + bytes[3] + bytes[0] + bytes[1];
         const number = Number.parseInt(littleEndianValue, 16);
         const numberHex = number.toString(16);

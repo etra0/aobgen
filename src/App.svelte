@@ -1,45 +1,3 @@
-<script lang="ts">
-import { tick } from "svelte";
-
-	import { AOBGenerator } from "./AOBGen";
-	import { tick } from "svelte";
-
-	let aobgen = new AOBGenerator();
-	let input = '';
-	let wildcardOffsets = false;
-	let resultHover = "";
-	let inputbox;
-	$: result = aobgen.generateAob(input, wildcardOffsets);
-
-	async function handleMouse(inputbox: any, event: MouseEvent | KeyboardEvent, wildcard: boolean) {
-		const { selectionStart, selectionEnd, value } = inputbox;
-		const selection = value.slice(selectionStart, selectionEnd);
-		if (selection === "") {
-			resultHover = "";
-			return;
-		}
-
-		resultHover = aobgen.generateAob(selection, wildcard);
-		console.log(selection, selectionStart, selectionEnd)
-		await tick();
-	}
-
-</script>
-
-<main>
-	<textarea bind:value={input} placeholder="Enter the disassembly"
-		on:mouseup={event => handleMouse(inputbox, event, wildcardOffsets)}
-		bind:this={inputbox}
-		rows="20"
-	/>
-	<div class="info">
-		<label for="wildcard">Wildcard offsets: </label>
-		<input name="wildcard" type="checkbox" bind:checked={wildcardOffsets} on:change={() => handleMouse(inputbox, null, wildcardOffsets)}>
-	</div>
-	<p>AOB: <code>{resultHover || result}</code></p>
-	<button on:click={() => navigator.clipboard.writeText(resultHover || result)}>Copy to clipboard</button>
-</main>
-
 <style>
 	main {
 		text-align: center;
@@ -73,3 +31,48 @@ import { tick } from "svelte";
 		}
 	}
 </style>
+
+<script lang="ts">
+import { tick } from "svelte";
+
+	import { AOBGenerator } from "./AOBGen";
+	import { tick } from "svelte";
+
+	let aobgen = new AOBGenerator();
+	let input = '';
+	let wildcardOffsets = false;
+	let resultHover = "";
+	let inputbox;
+	$: result = aobgen.generateAob(input, wildcardOffsets);
+
+	async function handleMouse(inputbox: any, event: MouseEvent | KeyboardEvent, wildcard: boolean) {
+		const { selectionStart, selectionEnd, value } = inputbox;
+		const selection = value.slice(selectionStart, selectionEnd);
+		if (selection === "") {
+			resultHover = "";
+			return;
+		}
+
+		resultHover = aobgen.generateAob(selection, wildcard);
+		await tick();
+	}
+
+</script>
+
+<main>
+	<p>AOB generator tool. Paste your x64dbg or Cheat Engine disassembly to generate an AOB.<br>
+		You can also select a portion of the disassembly to generate that specific AOB.</p>
+	<p>This project is <bold>heavily</bold> based off <a href="https://github.com/FransBouma/InjectableGenericCameraSystem/tree/master/Tools/AOBGen">Frans's work</a></p>
+	<textarea bind:value={input} placeholder="Enter the disassembly"
+		on:mouseup={event => handleMouse(inputbox, event, wildcardOffsets)}
+		bind:this={inputbox}
+		rows="20"
+	/>
+	<div class="info">
+		<label for="wildcard">Wildcard offsets: </label>
+		<input name="wildcard" type="checkbox" bind:checked={wildcardOffsets} on:change={() => handleMouse(inputbox, null, wildcardOffsets)}>
+	</div>
+	<p>AOB: <code>{resultHover || result}</code></p>
+	<button on:click={() => navigator.clipboard.writeText(resultHover || result)}>Copy to clipboard</button>
+</main>
+

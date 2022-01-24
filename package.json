@@ -1,11 +1,13 @@
 {
-  "name": "svelte-app",
+  "name": "aob-generator",
+  "homepage": "https://etra0.github.io/aobgen/",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv public --no-clear",
+    "predeploy": "rollup -c",
     "deploy": "gh-pages -d public",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "jest"
