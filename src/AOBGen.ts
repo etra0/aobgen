@@ -6,15 +6,17 @@
 export class AOBGenerator {
     generateAob(toParse: string, alsoWildcardOffsets: boolean): string {
         const lineEndings = /[\r\n]/;
-        const splitted = toParse.split(lineEndings);
+        const execName = /^[/\w].*?\.exe/igm;
         const countChar = (arr: string[], c: string) => arr.reduce((acc, x) => acc + (x == c ? 1 : 0), 0);
+        
+        // We strip executable name because if contains a dash it could cause some parsing issues.
+        let splitted = toParse.split(lineEndings).map(x => x.toLowerCase().replace(execName, ""));
 
         if (splitted.length == 0)
             return "";
         
         if (splitted[0].includes("|"))
             return this.handleX64Dbg(splitted, alsoWildcardOffsets);
-        // A bit boilerplate-y, but we basically check how many times '-' is in the string, according to Frans's version.
         else if (countChar(splitted[0].split(""), "-") > 1)
             return this.handleCheatEngine(splitted, alsoWildcardOffsets);
         else 
@@ -31,7 +33,7 @@ export class AOBGenerator {
             fragments[1] = fragments[1].replace(":", " ");
             result += this.handleByteFragments(fragments[1], fragments[2], alsoWildcardOffsets);
         }
-        return result.trim();
+        return result.trim().toUpperCase();
     }
 
     private handleCheatEngine(words: string[], alsoWildcardOffsets: boolean): string {
@@ -47,7 +49,7 @@ export class AOBGenerator {
 
             result += this.handleByteFragments(secondFragment, thirdFragment, alsoWildcardOffsets);
         }
-        return result.trim();
+        return result.trim().toUpperCase();
     }
 
     // Sadly, we have to return strings by copy, or something like that.
@@ -59,7 +61,7 @@ export class AOBGenerator {
             const bytes = byteFragments[i];
             switch(bytes.length) {
                 case 2:
-                    if (alsoWildcardOffsets && i == byteFragments.length - 1 && thirdFragment.includes("+" + bytes)) {
+                    if (alsoWildcardOffsets && i == (byteFragments.length - 1) && thirdFragment.includes("+" + bytes)) {
                         result += "?? ";
                     } else {
                         result += AOBGenerator.pureBytes(bytes);
@@ -68,7 +70,7 @@ export class AOBGenerator {
                 case 4:
                 case 6:
                     result += AOBGenerator.pureBytes(bytes);
-
+                    break;
                 case 8:
                     if (this.shouldWildcard(bytes.toLowerCase(), thirdFragment, alsoWildcardOffsets)) {
                         result += "?? ?? ?? ?? ";
@@ -89,11 +91,13 @@ export class AOBGenerator {
         const number = Number.parseInt(littleEndianValue, 16);
         const numberHex = number.toString(16);
 
-        if (alsoWildcardOffsets) {
-            return thirdFragment.includes(numberHex) || thirdFragment.includes(littleEndianValue);
+        const isRelativeOffset = thirdFragment.includes(numberHex) || thirdFragment.includes(littleEndianValue);
+
+        if (alsoWildcardOffsets && isRelativeOffset) {
+            return true;
         }
 
-        return !thirdFragment.includes(numberHex) || !thirdFragment.includes(littleEndianValue);
+        return !thirdFragment.includes(numberHex) && !thirdFragment.includes(littleEndianValue);
     }
 
     private static pureBytes(bytes: string): string {
