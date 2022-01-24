@@ -25,11 +25,23 @@ export class AOBGenerator {
             fragments[1] = fragments[1].replace(":", " ");
             result += this.handleByteFragments(fragments[1], fragments[2], alsoWildcardOffsets);
         }
-        return result;
+        return result.trim();
     }
 
     private handleCheatEngine(words: string[], alsoWildcardOffsets: boolean): string {
-        return "";
+        let result = "";
+        for (const word of words) {
+            const firstHyphen = word.indexOf("-");
+            if (firstHyphen < 0) continue;
+
+            const secondHyphen = word.indexOf("-", firstHyphen + 1);
+            if (secondHyphen < 0) continue;
+            const secondFragment = word.substring(firstHyphen + 1, secondHyphen - 1).trim();
+            const thirdFragment = word.substring(secondHyphen + 1).trim().toLowerCase();
+
+            result += this.handleByteFragments(secondFragment, thirdFragment, alsoWildcardOffsets);
+        }
+        return result.trim();
     }
 
     // Sadly, we have to return strings by copy, or something like that.
@@ -80,7 +92,7 @@ export class AOBGenerator {
 
     private static pureBytes(bytes: string): string {
         let acc = "";
-        for (let i = 0; i < bytes.length; i++) {
+        for (let i = 0; i < bytes.length; i+= 2) {
             acc += bytes[i] + bytes[i + 1] + " ";
         }
 
