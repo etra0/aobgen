@@ -33,7 +33,8 @@
 </style>
 
 <script lang="ts">
-import { tick } from "svelte";
+    import { tick } from "svelte";
+    import { CURRENT_VERSION } from "../current_version"
 
 	import { AOBGenerator } from "./AOBGen";
 	import { tick } from "svelte";
@@ -74,5 +75,6 @@ import { tick } from "svelte";
 	</div>
 	<p>AOB: <code>{resultHover || result}</code></p>
 	<button on:click={() => navigator.clipboard.writeText(resultHover || result)}>Copy to clipboard</button>
+    <p>Current version: {CURRENT_VERSION}</p>
 </main>
 

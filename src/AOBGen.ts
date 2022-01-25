@@ -56,13 +56,17 @@ export class AOBGenerator {
     private handleByteFragments(secondFragment: string, thirdFragment: string, alsoWildcardOffsets: boolean): string {
         const byteFragments = secondFragment.split(" ");
         let result = "";
+        // We usually want to wildcard only once, since second operand is
+        // highly unlikely to be an offset.
+        let wasWildcarded = false;
 
         for (let i = 0; i < byteFragments.length; i++) {
             const bytes = byteFragments[i];
             switch(bytes.length) {
                 case 2:
-                    if (alsoWildcardOffsets && i == (byteFragments.length - 1) && thirdFragment.includes("+" + bytes)) {
+                    if (!wasWildcarded && alsoWildcardOffsets && i == (byteFragments.length - 1) && thirdFragment.includes("+" + bytes)) {
                         result += "?? ";
+                        wasWildcarded = true;
                     } else {
                         result += AOBGenerator.pureBytes(bytes);
                     }
@@ -72,8 +76,9 @@ export class AOBGenerator {
                     result += AOBGenerator.pureBytes(bytes);
                     break;
                 case 8:
-                    if (this.shouldWildcard(bytes.toLowerCase(), thirdFragment, alsoWildcardOffsets)) {
+                    if (!wasWildcarded && this.shouldWildcard(bytes.toLowerCase(), thirdFragment, alsoWildcardOffsets)) {
                         result += "?? ?? ?? ?? ";
+                        wasWildcarded = true;
                     } else {
                         result += AOBGenerator.pureBytes(bytes);
                     }
